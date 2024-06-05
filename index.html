@@ -9,7 +9,79 @@
 </head>
 
 <body>
-  <main class="p-4 bg-gray-50 min-h-screen"></main>
+  <main class="p-4 bg-gray-50 min-h-screen">
+    <div class="max-w-screen-xl mx-auto bg-white p-8 rounded-lg shadow-2xl">
+      <h2 class="text-3xl my-6">說說你的想法吧</h2>
+      <!-- 留言區 -->
+      <form action="" class="grid">
+        <textarea name="comment" id="" placeholder="請輸入你的評論" class="bg-gray-50 p-2 rounded-xl"></textarea>
+        <fieldset class="py-4">
+          <input type="submit" value="留言" class="px-4 py-1 bg-blue-600 rounded text-white">
+          <input type="reset" value="取消" class="px-4 py-1 bg-yellow-400 rounded border ml-3">
+        </fieldset>
+      </form>
+      <!-- 分隔線 -->
+      <div class="border-b border-gray-300 my-2 mb-4"></div>
+      <!-- 留言回覆區 -->
+      <div>
+        <div class="flex">
+          <!-- 即使在 public 文件夾下，也需要使用 / 絕對路徑引用它下面的文件，省略 Public -->
+          <img src="/images/face1.png" alt="" class="w-12 h-12 mr-4 rounded-full" /> <!-- rounded-full 方形變圓形 -->
+          <div>
+            <p>機器人 1 號</p>
+            <p class="text-gray-600 text-sm">18 小時之前</p>
+          </div>
+          <!-- 三點圖標：flex 佈局下 ml-auto 向右對齊 -->
+          <span class="ml-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
+              fill="currentColor">
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+            </svg>
+          </span>
+        </div>
+        <p class="text-gray-600 py-4">
+          哇！這篇文章真是寫的太好啦！收到很大的啟發，希望你再接再厲，發表越來越多文章！
+        </p>
+        <div class="pl-8 border-l-2 border-gray-200">
+          <div class="flex">
+            <img src="/images/face2.png" alt="" class="w-12 h-12 mr-4 rounded-full" />
+            <div>
+              <p>機器人 2 號</p>
+              <p class="text-gray-600 text-sm">1 小時之前</p>
+            </div>
+            <span class="ml-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
+                fill="currentColor">
+                <path
+                  d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </span>
+          </div>
+          <p class="text-gray-600 py-4">
+            有同感，值得大大的鼓勵，讚！
+          </p>
+          <div class="flex">
+            <img src="/images/face3.png" alt="" class="w-12 h-12 mr-4 rounded-full" />
+            <div>
+              <p>機器人 3 號</p>
+              <p class="text-gray-600 text-sm">10 小時之前</p>
+            </div>
+            <span class="ml-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
+                fill="currentColor">
+                <path
+                  d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </span>
+          </div>
+          <p class="text-gray-600 py-4">
+            沒錯，中立且不失公允，大推！
+          </p>
+        </div>
+        <button class="pt-4 pb-10 text-blue-600">回覆</button>
+      </div>
+    </div>
+  </main>
   <script type="module" src="/main.js">
   </script>
 </body>

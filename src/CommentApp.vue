@@ -2,7 +2,7 @@
   <main class="p-4 bg-gray-50 min-h-screen">
     <div class="max-w-screen-xl mx-auto bg-white p-8 rounded-lg shadow-2xl">
       <h2 class="text-3xl my-6">說說你的想法吧</h2>
-      <CommentBox />
+      <CommentBox @submit="addNewComment"/>
       <!-- 分隔線 -->
       <DividerHorizontal />
       <!-- 留言區 -->
@@ -30,6 +30,8 @@
 
 <!-- 有 setup 就不用 export，反之需要 export 給組件使用 -->
 <script setup>
+import { ref } from "vue";
+
 import CommentBox from "./components/CommentBox.vue";
 import CommentItem from "./components/CommentItem.vue";
 import DividerHorizontal from "./components/DividerHorizontal.vue";
@@ -38,9 +40,12 @@ import ReplyBox from "./components/ReplyBox.vue";
 import face1 from "./assets/face1.png";
 import face2 from "./assets/face2.png";
 import face3 from "./assets/face3.png";
+import face4 from "./assets/face4.png";
+
+let rid = ref(4);
 
 // 先定義為常量，之後會定義為 ref
-const comments = [
+const comments = ref([
   {
     id: 1,
     user: "夢落輕尋",
@@ -66,7 +71,22 @@ const comments = [
       },
     ],
   },
-];
+]);
+
+const constructNewComment = (content) => {
+  return {
+    id: rid.value++,
+    user: "目前用戶",
+    avatar: face4,
+    content,
+    time: "1秒前",
+  };
+};
+
+const addNewComment = (content) => {
+  const newComment = constructNewComment(content);
+  comments.value.push(newComment);
+};
 </script>
 
 <style></style>

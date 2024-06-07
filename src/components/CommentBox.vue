@@ -10,11 +10,15 @@
   </form>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 
 const content = ref("");
+
+// 使用 defineEmits 定義事件
 const emit = defineEmits(["submit"]);
+
+// 提交處理函數
 const handleSubmit = (e) => {
   e.preventDefault();
   emit("submit", content.value);

@@ -23,7 +23,12 @@
           :time="reply.time" 
           :content="reply.content" />
         </ReplyContainer>
-        <ReplyBox/>
+        <ReplyBox @submit="addReply($event, comment.id)"/>
+        <!-- 
+        當 submit 事件觸發時，調用 addReply 方法，傳入回覆內容（$event）和當前評論的 ID（comment.id）
+        $event 事件數據，即 CommentBox 傳遞過來的用戶輸入的回覆內容，
+        第二個參數是當前評論的 ID，針對這一條留言的回覆。 
+        -->
       </div>
     </div>
   </main>
@@ -50,26 +55,26 @@ let rid = ref(4);
 const comments = ref([
   {
     id: 1,
-    user: "夢落輕尋",
+    user: "Jenny",
     avatar: face1,
-    time: "2小時之前",
+    time: "5小時之前",
     content:
-      "哇！這篇真是寫的太好啦！收到很大的啟發，希望版主能夠再接再厲，產出越來越多內容！",
+      "哇！這篇真是寫的太好了，收到很大的啟發，希望能夠繼續產出更多優質內容！",
     replies: [
       {
         id: 2,
-        user: "陌上花開",
+        user: "Henry",
         avatar: face2,
-        time: "2小時之前",
+        time: "4小時之前",
         content: "認同！",
       },
       {
         id: 3,
-        user: "半夢半醒半浮生",
+        user: "Oscar",
         avatar: face3,
-        time: "2小時之前",
+        time: "1小時之前",
         content:
-          "這篇寫的非常好，無論是技術點還是理論點都非常好，也有自己的看法，真的是非常好的文章。",
+          "這篇寫的非常好，兼具專業與實務方面，也有自己的看法，真的是非常好的文章。",
       },
     ],
   },
@@ -89,6 +94,25 @@ const addNewComment = (content) => {
   const newComment = constructNewComment(content);
   comments.value.push(newComment);
 };
+
+const addReply = (content, id) => {
+  // 接收兩個參數：content 和 id，content 是回覆的內容，id 是評論的唯一標識符，用來確定要回覆哪一條評論
+  const reply = constructNewComment(content);
+  // constructNewComment 是一個函數，用來生成一個新的回覆對象。
+  // 該函數接收 content 作為參數，並返回一個包含回覆內容及其他訊息（如時間、用戶、ID 等）的對象。  
+  
+  let comment = comments.value.find((comment) => comment.id === id);
+  // 根據傳入的 id，找到對應的評論對象，準備將新的回覆添加到這個評論的回覆列表中。
+
+  if (comment.replies) {
+    comment.replies.push(reply);
+    // 如果 replies 屬性存在，則表示該留言已有回覆，將新生成的回覆 reply 新增到 replies 陣列中
+  } else {
+    comment.replies = [reply];
+    // 如果 replies 屬性不存在，代表這是該留言的第一個回覆，將 replies 初始化為一個包含新回覆的陣列。
+  }
+};
+
 </script>
 
 <style></style>

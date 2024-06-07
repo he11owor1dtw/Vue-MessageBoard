@@ -13,7 +13,7 @@
         :time="comment.time" 
         :content="comment.content" />
         <!-- 回覆區 -->
-        <ReplyBox v-if="comment.replies">
+        <ReplyContainer v-if="comment.replies">
           <!-- 回覆內容 -->
           <CommentItem 
           v-for="reply in comment.replies"
@@ -22,7 +22,8 @@
           :avatar="reply.avatar" 
           :time="reply.time" 
           :content="reply.content" />
-        </ReplyBox>
+        </ReplyContainer>
+        <ReplyBox/>
       </div>
     </div>
   </main>
@@ -36,6 +37,7 @@ import CommentBox from "./components/CommentBox.vue";
 import CommentItem from "./components/CommentItem.vue";
 import DividerHorizontal from "./components/DividerHorizontal.vue";
 import ReplyBox from "./components/ReplyBox.vue";
+import ReplyContainer from "./components/ReplyContainer.vue";
 
 import face1 from "./assets/face1.png";
 import face2 from "./assets/face2.png";

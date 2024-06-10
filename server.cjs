@@ -44,10 +44,93 @@ async function getAllComments() {
   return commentsPopulated;
 }
 
+async function addComment({ content, replyTo = "" }) {
+  let no =
+    (await notion.databases.query({ database_id: NOTION_DB_ID })).results
+      .length + 1;
+  // 獲取序號，在 Notion 的 database 中，把標題改成了序號(no)，
+  // 用 Notion Client 獲取了現有的留言數量，在此基礎上加 1
+
+  let { avatar_url, name } = await notion.users.retrieve({
+    user_id: NOTION_CURR_USER_ID,
+  });
+  // 通過 notion client 的 user api，獲取用戶名和頭像，把環境變量中，保存的當前用戶 ID 傳遞進去，
+  // 再把返回結果中的 avatar_url 和 name 屬性解構出來
+
+  notion.request({
+    method: "POST",
+    path: "pages",
+    body: {
+      parent: { database_id: NOTION_DB_ID },
+      // parent 設置數據庫的 id，指定在哪個數據庫中添加頁面
+      properties: {
+        no: {
+          title: [
+            {
+              text: {
+                content: no.toString(),
+              },
+            },
+          ],
+        },
+        // no 為頁面標題，title 類型，也是個富文本，傳遞一個陣列，
+        // 陣列的第一個元素爲 text 對象，content 屬性值爲之前獲取到的序號
+        user: {
+          rich_text: [
+            {
+              text: {
+                content: name,
+              },
+            },
+          ],
+        },
+        // user 是富文本類型，傳遞一個陣列，設置屬性值爲當前用戶的用戶名
+        avatar: {
+          url: avatar_url,
+        },
+        // avatar 是 url 類型，設置它的 url 屬性爲當前用戶的頭像 url
+        content: {
+          rich_text: [
+            {
+              text: {
+                content,
+              },
+            },
+          ],
+        },
+        // content 富文本類型，設置留言內容
+
+        // 如果有 replyTO 參數傳遞進來的，再添加到請求 body 中
+        // 利用擴展運算符，可以在有 replyTo 屬性的時候，把後面的對象解構出來，放到父對象中，
+        // 如果沒有就不會解構出任何東西來，適合在創建對象字面值的時候，根據條件添加屬性
+        ...(replyTo && {
+          replyTo: {
+            relation: [
+              {
+                id: replyTo,
+              },
+            ],
+          },
+        }),
+      },
+    },
+  });
+}
+
 app.get("/comments", async (req, res) => {
   try {
     const comments = await getAllComments();
     res.json(comments);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
+
+app.post("/comments", async (req, res) => {
+  try {
+    await addComment(req.body);
+    res.sendStatus(201);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

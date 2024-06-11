@@ -48,8 +48,6 @@ import face2 from "./assets/face2.png";
 import face3 from "./assets/face3.png";
 import face4 from "./assets/face4.png";
 
-let rid = ref(4);
-
 // 先定義為常量，之後會定義為 ref
 const comments = ref([]);
 
@@ -77,7 +75,6 @@ const addNewComment = async (content, replyTo) => {
   });
 
   const newComment = await res.json();
-
   if (!replyTo) {
     // 如果 replyTo 是空的，表示這是一條新的留言（而不是回覆）
     comments.value.unshift(newComment);

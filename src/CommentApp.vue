@@ -7,12 +7,20 @@
       <DividerHorizontal />
       <!-- 留言區 -->
       <div v-for="comment in comments" :key="comment.id">
-        <CommentItem :user="comment.user" :avatar="comment.avatar" :time="comment.time" :content="comment.content" />
+        <CommentItem 
+        :user="comment.user" 
+        :avatar="comment.avatar" 
+        :time="comment.time" 
+        :content="comment.content" />
         <!-- 回覆區 -->
         <ReplyContainer v-if="comment.replies">
           <!-- 回覆內容 -->
-          <CommentItem v-for="reply in comment.replies" :key="reply.id" :user="reply.user" :avatar="reply.avatar"
-            :time="reply.time" :content="reply.content" />
+          <CommentItem v-for="reply in comment.replies" 
+          :key="reply.id" 
+          :user="reply.user" 
+          :avatar="reply.avatar"            
+          :time="reply.time" 
+          :content="reply.content" />
         </ReplyContainer>
         <ReplyBox @submit="addNewComment($event, comment.id)" />
         <!-- 
@@ -56,7 +64,7 @@ onMounted(() => {
 
 // 這個函數可以一併處理發表留言和回覆，因爲已經不需要手動維護 comments 這個列表陣列了，只是發送數據給後台，
 const addNewComment = async (content, replyTo) => {
-  await fetch(`/api/comments`, {
+  const res = await fetch(`/api/comments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -64,15 +72,28 @@ const addNewComment = async (content, replyTo) => {
     body: JSON.stringify({
       content,
       ...(replyTo && { replyTo }),
-      // 利用展開運算符技巧，根據 replyTo 是否有值，來決定是否增加 replyTo 屬性
+      // 利用展開運算符，根據 replyTo 是否有值，來決定是否增加 replyTo 屬性
     }),
   });
 
+  const newComment = await res.json();
+
+  if (!replyTo) {
+    // 如果 replyTo 是空的，表示這是一條新的留言（而不是回覆）
+    comments.value.unshift(newComment);
+    // 將新留言 newComment 插入到 comments 列表的開頭（unshift 方法將元素添加到陣列的開頭）
+  } else {
+    // 反之如果有值，表示這是一條回覆，replyTo 是被回覆的留言 ID
+    comments.value.find((c) => c.id === replyTo).replies.unshift(newComment);
+    // 在 comments 列表中查找與 replyTo ID 匹配的留言
+    // 找到匹配的留言後，將新回覆 newComment 插入到這條留言的 replies 列表開頭
+  }
+
   // 新增完評論後，使用 setTimeout() 再請求獲取新的留言列表
   // Notion API 有延遲，在添加完 page 之後，需要等一下才能讀取到新的評論列表
-  setTimeout(async () => {
-    await getAllComments();
-  }, 1000);
+  // setTimeout(async () => {
+  //   await getAllComments();
+  // }, 1000);
 };
 
 </script>

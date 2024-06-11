@@ -21,15 +21,7 @@ async function getAllComments() {
   const comments = new Map();
   // 原始評論數據
   result?.results?.forEach((page) => {
-    comments.set(page.id, {
-      id: page.id,
-      user: page.properties.user.rich_text[0].text.content,
-      time: getRelativeTimeDesc(page.properties.time.created_time),
-      content: page.properties.content.rich_text[0].text.content,
-      avatar: page.properties.avatar.url,
-      replies: page.properties.replies.relation,
-      replyTo: page.properties.replyTo?.relation[0]?.id,
-    });
+    comments.set(page.id, transformPageObject(page));
   });
 
   // 組裝回覆，把關係 id 替換爲實際評論
@@ -57,7 +49,9 @@ async function addComment({ content, replyTo = "" }) {
   // 通過 notion client 的 user api，獲取用戶名和頭像，把環境變量中，保存的當前用戶 ID 傳遞進去，
   // 再把返回結果中的 avatar_url 和 name 屬性解構出來
 
-  notion.request({
+
+
+  const page = await notion.request({
     method: "POST",
     path: "pages",
     body: {
@@ -115,6 +109,8 @@ async function addComment({ content, replyTo = "" }) {
       },
     },
   });
+
+  return transformPageObject(page);
 }
 
 app.get("/comments", async (req, res) => {
@@ -129,8 +125,8 @@ app.get("/comments", async (req, res) => {
 
 app.post("/comments", async (req, res) => {
   try {
-    await addComment(req.body);
-    res.sendStatus(201);
+    const newPage = await addComment(req.body);
+    res.status(201).json(newPage);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -140,6 +136,19 @@ app.post("/comments", async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
+// app.js
+function transformPageObject(page) {
+  return {
+    id: page.id,
+    user: page.properties.user.rich_text[0].text.content,
+    time: getRelativeTimeDesc(page.properties.time.created_time),
+    content: page.properties.content.rich_text[0].text.content,
+    avatar: page.properties.avatar.url,
+    replies: page.properties.replies.relation,
+    replyTo: page.properties.replyTo?.relation[0]?.id,
+  };
+}
 
 function getRelativeTimeDesc(time) {
   const currentInMs = new Date().getTime();

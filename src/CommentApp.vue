@@ -14,11 +14,11 @@
           <CommentItem v-for="reply in comment.replies" :key="reply.id" :user="reply.user" :avatar="reply.avatar"
             :time="reply.time" :content="reply.content" />
         </ReplyContainer>
-        <ReplyBox @submit="addReply($event, comment.id)" />
+        <ReplyBox @submit="addNewComment($event, comment.id)" />
         <!-- 
-        當 submit 事件觸發時，調用 addReply 方法，傳入回覆內容（$event）和當前評論的 ID（comment.id）
+        當 submit 事件觸發時，調用 addNewComment 方法，傳入回覆內容（$event）和當前評論的 ID（comment.id）
         $event 事件數據，即 CommentBox 傳遞過來的用戶輸入的回覆內容，
-        第二個參數是當前評論的 ID，針對這一條留言的回覆。 
+        第二個參數是當前回覆的 ID，針對這一條留言的回覆。 
         -->
       </div>
     </div>
@@ -54,37 +54,25 @@ onMounted(() => {
   getAllComments();
 });
 
-const addNewComment = (content) => {
-  const newComment = constructNewComment(content);
-  comments.value.push(newComment);
-};
+// 這個函數可以一併處理發表留言和回覆，因爲已經不需要手動維護 comments 這個列表陣列了，只是發送數據給後台，
+const addNewComment = async (content, replyTo) => {
+  await fetch(`/api/comments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      content,
+      ...(replyTo && { replyTo }),
+      // 利用展開運算符技巧，根據 replyTo 是否有值，來決定是否增加 replyTo 屬性
+    }),
+  });
 
-const constructNewComment = (content) => {
-  return {
-    id: rid.value++,
-    user: "目前用戶",
-    avatar: face4,
-    content,
-    time: "1秒前",
-  };
-};
-
-const addReply = (content, id) => {
-  // 接收兩個參數：content 和 id，content 是回覆的內容，id 是評論的唯一標識符，用來確定要回覆哪一條評論
-  const reply = constructNewComment(content);
-  // constructNewComment 是一個函數，用來生成一個新的回覆對象。
-  // 該函數接收 content 作為參數，並返回一個包含回覆內容及其他訊息（如時間、用戶、ID 等）的對象。  
-
-  let comment = comments.value.find((comment) => comment.id === id);
-  // 根據傳入的 id，找到對應的評論對象，準備將新的回覆添加到這個評論的回覆列表中。
-
-  if (comment.replies) {
-    comment.replies.push(reply);
-    // 如果 replies 屬性存在，則表示該留言已有回覆，將新生成的回覆 reply 新增到 replies 陣列中
-  } else {
-    comment.replies = [reply];
-    // 如果 replies 屬性不存在，代表這是該留言的第一個回覆，將 replies 初始化為一個包含新回覆的陣列。
-  }
+  // 新增完評論後，使用 setTimeout() 再請求獲取新的留言列表
+  // Notion API 有延遲，在添加完 page 之後，需要等一下才能讀取到新的評論列表
+  setTimeout(async () => {
+    await getAllComments();
+  }, 1000);
 };
 
 </script>

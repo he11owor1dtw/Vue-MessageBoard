@@ -10,5 +10,5 @@ export default {
     extend: {},
   },
   plugins: [],
+  // mode:"jit", Tailwind 3.0 以上，JIT模式已經預設啟動，無須額外設定
 }
-

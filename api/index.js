@@ -6,7 +6,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 // 給 express 加上 json() 插件，把接收到的 HTTP 請求 BODY，從 JSON 轉換爲 JS 對象
-const port = 3001;
+// const port = 3001;
 
 const NOTION_KEY = process.env.NOTION_KEY;
 const NOTION_DB_ID = process.env.NOTION_DB_ID;
@@ -112,7 +112,7 @@ async function addComment({ content, replyTo = "" }) {
 }
 
 // 部屬到 vercel 後，請求路徑須加上 /api 前綴
-app.get("/comments", async (req, res) => {
+app.get("/api/comments", async (req, res) => {
   try {
     const comments = await getAllComments();
     res.json(comments);
@@ -122,7 +122,7 @@ app.get("/comments", async (req, res) => {
   }
 });
 
-app.post("/comments", async (req, res) => {
+app.post("/api/comments", async (req, res) => {
   try {
     const newPage = await addComment(req.body);
     res.status(201).json(newPage);
@@ -132,9 +132,9 @@ app.post("/comments", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`);
+// });
 
 // app.js
 function transformPageObject(page) {
